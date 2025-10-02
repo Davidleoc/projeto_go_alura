@@ -24,7 +24,7 @@ jobs:
     - name: Inicia banco
       run: docker compose up -d postgres
 
-    -name: Lint
+    - name: Lint
      run: docker run --rm -itv $(CURDIR):/app -w /app golangci/golangci-lint golangci-lint run controllers/ database/ models/ routes/
 
     - name: Test
