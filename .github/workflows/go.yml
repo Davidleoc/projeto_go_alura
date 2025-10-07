@@ -1,4 +1,4 @@
-name: Integracao Continua 
+name: Integracao Continua
 
 on:
   push:
@@ -9,31 +9,36 @@ on:
 jobs:
   ci:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout do código
+        uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v4
-      with:
-        go-version: '1.22'
+      - name: Instala o Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.22'
 
-    - name: Inicia containers
-      run: docker compose up -d
+      - name: Sobe os containers
+        run: docker compose up -d
 
-    - name: Aguarda o container app ficar pronto
-      run: sleep 10
+      - name: Aguarda os containers subirem
+        run: sleep 10
 
-    - name: Lint
-      uses: golangci/golangci-lint-action@v6
-      with:
-        version: v1.59
-        args: controllers/ database/ models/ routes/
+      - name: Verifica status dos containers (debug)
+        run: docker compose ps
 
-    - name: Test
-      run: |
-        DB_HOST=${{ secrets.DB_HOST }} \
-        DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-        DB_USER=${{ secrets.DB_USER }} \
-        DB_NAME=${{ secrets.DB_NAME }} \
-        DB_PORT=${{ secrets.DB_PORT }} \
-        docker compose exec app go test main_test.go
+      - name: Lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.59
+          args: controllers/ database/ models/ routes/
+
+      - name: Testes
+        run: |
+          DB_HOST=${{ secrets.DB_HOST }} \
+          DB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+          DB_USER=${{ secrets.DB_USER }} \
+          DB_NAME=${{ secrets.DB_NAME }} \
+          DB_PORT=${{ secrets.DB_PORT }} \
+          docker compose run --rm app go test ./...
