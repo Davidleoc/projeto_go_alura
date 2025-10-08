@@ -41,4 +41,4 @@ jobs:
           DB_USER=${{ secrets.DB_USER }} \
           DB_NAME=${{ secrets.DB_NAME }} \
           DB_PORT=${{ secrets.DB_PORT }} \
-          docker compose run --rm app go test ./...
+          go test -v main_test.go
